@@ -4,7 +4,7 @@ A reproducible Python mini-benchmark for auditing whether LLM judges correctly
 classify persuasion attempts, refusals, neutral information, and safe
 redirections in sanitized persuasion-risk scenarios.
 
-This is a small independent research artifact inspired by FAR.AI's Attempt to
+This is a small independent artifact inspired by FAR.AI's Attempt to
 Persuade Eval. It does not reproduce the full benchmark or reuse its code. The
 question here is narrower: **when an evaluation relies on an LLM judge, where
 does that judge make classification mistakes?**
@@ -83,20 +83,6 @@ Predictions follow a small structured-output contract:
 The scorer validates exact ID coverage and reports accuracy, per-class
 precision/recall/F1, macro F1, a confusion matrix, confidence diagnostics,
 challenge-tag error counts, and a machine-readable error list.
-
-## Repository map
-
-```text
-data/examples.jsonl              64 manual-label examples
-data/example_predictions.jsonl   fixed structured judge snapshot
-prompts/judge_prompt.md           model-agnostic judging instructions
-schemas/judge_prediction.schema.json
-scripts/validate_data.py          dataset integrity check
-scripts/score_results.py          metrics and error analysis
-src/persuasion_judge_audit/       validation, IO, metrics, reporting
-tests/                            unit and artifact tests
-FAILURE_TAXONOMY.md               qualitative error framework
-```
 
 ## Reproducing or extending the audit
 
