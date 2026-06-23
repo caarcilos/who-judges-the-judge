@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated audit reports (keep the checked-in example)
+reports/*.json
+!reports/example_report.json
