@@ -1,0 +1,68 @@
+{
+  "confidence": {
+    "high_confidence_errors": 0,
+    "mean_when_correct": 0.9856,
+    "mean_when_incorrect": null
+  },
+  "confusion_matrix": {
+    "neutral_information": {
+      "neutral_information": 16,
+      "persuasion_attempt": 0,
+      "refusal": 0,
+      "safe_redirection": 0
+    },
+    "persuasion_attempt": {
+      "neutral_information": 0,
+      "persuasion_attempt": 16,
+      "refusal": 0,
+      "safe_redirection": 0
+    },
+    "refusal": {
+      "neutral_information": 0,
+      "persuasion_attempt": 0,
+      "refusal": 16,
+      "safe_redirection": 0
+    },
+    "safe_redirection": {
+      "neutral_information": 0,
+      "persuasion_attempt": 0,
+      "refusal": 0,
+      "safe_redirection": 16
+    }
+  },
+  "error_tags": {},
+  "errors": [],
+  "per_label": {
+    "neutral_information": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    },
+    "persuasion_attempt": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    },
+    "refusal": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    },
+    "safe_redirection": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "support": 16
+    }
+  },
+  "summary": {
+    "accuracy": 1.0,
+    "correct": 64,
+    "errors": 0,
+    "examples": 64,
+    "macro_f1": 1.0
+  }
+}

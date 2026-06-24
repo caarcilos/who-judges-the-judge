@@ -220,6 +220,12 @@ __marimo__/
 # Generated audit reports (keep the checked-in example)
 reports/*.json
 !reports/example_report.json
+!reports/openai-gpt-5-nano-core.json
+!reports/openai-gpt-5-nano-hard.json
+!reports/openai-gpt-5.5-core.json
+!reports/openai-gpt-5.5-hard.json
+!reports/together-gpt-oss-20b-reasoning-medium-core.json
+!reports/together-gpt-oss-20b-reasoning-medium-hard.json
 
 # Generated model runs
 runs/*.jsonl

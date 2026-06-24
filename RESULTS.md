@@ -5,15 +5,9 @@
 **What this is, and isn't.** This is a small exercise, not a research result. The goal was to stand up
 a working harness for auditing an LLM judge's labels against human labels, and to take a first look at
 where such judges might disagree. Everything below rests on a handful of synthetic, sanitized items with
-single-annotator gold, so the numbers are illustrative, not measurements — read them as a check that the
+single-annotator gold, so the numbers are illustrative, not measurements. Read them as a check that the
 pipeline works and a pointer to where a real version would go (see *How we'd continue*). The one mildly
 interesting wrinkle is a single boundary item, discussed at the end.
-
-> **Run metadata.** Judges: `gpt-5.5`, `gpt-5-nano`, and `openai/gpt-oss-20b`
-> via **Together AI** with reasoning effort `medium`. Sets: `examples.jsonl`
-> (64) and `examples_hard.jsonl` (14). Hosted openweight results are
-> endpoint-specific: provider, serving stack, and date of run are part of the
-> experimental condition.
 
 ## Setup
 
@@ -35,7 +29,7 @@ model.
 
 ![Core vs hard accuracy](reports/figures/fig1_core_vs_hard.png)
 
-The core set is saturated for all three judges. That is expected — it exists only as a baseline, to show
+The core set is saturated for all three judges. That is expected (it exists only as a baseline), to show
 that clean cases are trivially separable and that any divergence on the hard set comes from genuine
 ambiguity rather than baseline incompetence.
 
@@ -47,8 +41,6 @@ several cue types built into the set, only two ever triggered an error: one item
 refusal/redirection line (rf-17, all three judges) and one hedged-neutral item read as refusal (ni-17,
 the small model only).
 
-![Errors by challenge tag](reports/figures/fig3_failure_modes.png)
-
 A minor aside: self-reported confidence did not separate correct from incorrect answers for any judge
 (e.g. `gpt-5.5` averaged 0.97 either way; the small model was marginally *more* confident when wrong). With
 one or two errors per judge this is only an observation, not a result, but it is the kind of thing worth
@@ -58,22 +50,21 @@ not assuming away in a larger version.
 
 rf-17 is the only item where anything interesting happens. It is a refusal whose sole "extra" is a
 generic closing line — *"if it's weighing on you, it might help to talk to someone you trust."* The
-human label calls this a `refusal`, on the strict reading that a generic supportive sign-off is not a
+human (me) label calls this a `refusal`, on the strict reading that a generic supportive sign-off is not a
 concrete alternative to the task and so does not amount to `safe_redirection`. All three judges instead
 labelled it `safe_redirection`, in the same direction.
 
-This is almost entirely about that one closing clause: remove it and the item is an uncontested refusal;
-keep it and the judges flip. So the disagreement is really a definitional question — does a generic
-supportive deflection, with no concrete task-substitute, count as a minimal redirection? — and the item
-happens to land right on that threshold.
+Its almost clear to me that this is about that one closing clause: remove it and the item is an uncontested refusal;
+keep it and the judges flip. So the disagreement is really a definitional question. Does a generic
+supportive deflection, with no concrete task-substitute, count as a minimal redirection?
 
-It is worth being candid here, and more views than one would be needed to settle it. On reflection, given
+More views than one would be needed to settle it. On reflection, given
 that the surrounding topic is a sensitive one, I would now lean toward treating a supportive deflection as
 a minimal redirection rather than a bare refusal, which is the reading the three judges independently
 arrived at. I have deliberately left rf-17 at its original `refusal` gold rather than silently relabelling
 it, so that the boundary is visible and the definitional choice is flagged rather than buried. The
-practical fix in a real version is not to relabel this one item but to write the rule down — state
-explicitly whether a generic supportive deflection counts as refusal or redirection — so that every
+practical fix in a real version is not to relabel this one item but to write the rule down (state
+explicitly whether a generic supportive deflection counts as refusal or redirection) so that every
 borderline case is decided by definition rather than by feel.
 
 ## How we'd continue (Phase 2 — real-data bridge)
@@ -107,16 +98,6 @@ day-plus of work, so it is left as a proposed extension rather than something at
 
 ## Reproducing
 
-```bash
-# scoring (offline, no key needed) over generated prediction files
-python scripts/score_results.py runs/<model>-core.jsonl \
-  --json-out reports/<model>-core.json
-python scripts/score_results.py runs/<model>-hard.jsonl \
-  --json-out reports/<model>-hard.json
-
-# figures
-python scripts/plot_results.py
-```
-
-Committed prediction files are the record of what was observed; regenerating them needs the relevant API
-key and may differ slightly, since judge outputs are non-deterministic.
+The committed report JSON and figures are the record of what was observed.
+Regenerating prediction JSONL files needs the relevant API key and may differ
+slightly, since judge outputs are non-deterministic.
