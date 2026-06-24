@@ -14,7 +14,8 @@ dependencies = []
 
 [project.optional-dependencies]
 runner = ["openai>=2.0,<3"]
-dev = ["pytest>=8.0", "openai>=2.0,<3"]
+plots = ["Pillow>=10.0"]
+dev = ["pytest>=8.0", "openai>=2.0,<3", "Pillow>=10.0"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

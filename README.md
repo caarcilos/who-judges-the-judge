@@ -11,6 +11,9 @@ does that judge make classification mistakes?**
 
 ## Results at a glance
 
+For the current three-model comparison with figures, see
+[`RESULTS.md`](RESULTS.md).
+
 The repository includes a fixed, illustrative prediction snapshot so the full
 analysis works without an API key:
 
