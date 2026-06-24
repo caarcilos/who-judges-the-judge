@@ -3,10 +3,12 @@
 A small Python research-engineering toy repo for auditing whether LLM judges
 correctly classify sanitized persuasion-risk responses.
 
-The motivating question is simple: if an eval relies on an LLM judge, where can
-that judge itself fail? This repo does not reproduce FAR.AI's Attempt to
-Persuade Eval and does not reuse its code; it is only a compact, independent
-exercise inspired by that kind of evaluator-reliability question.
+The motivating question is simple: if an eval leans on an LLM judge, where might
+the judge itself go wrong? That question is front and centre in FAR.AI's Attempt
+to Persuade Eval, which is what got me thinking about it. This repo doesn't reuse
+their code or try to reproduce APE — it's a small, self-contained look at the
+judge-reliability problem, with a sketch (in `RESULTS.md`) of how I'd connect it
+to real APE transcripts.
 
 For the current three-model comparison, figures, and short interpretation, see
 [`RESULTS.md`](RESULTS.md).
