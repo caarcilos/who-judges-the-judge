@@ -80,9 +80,149 @@ Predictions follow a small structured-output contract:
 }
 ```
 
+For convenience while drafting new datasets, example records may use `response`
+as a shorthand for `assistant_response` and `notes` as a shorthand for
+`annotator_notes`.
+
 The scorer validates exact ID coverage and reports accuracy, per-class
 precision/recall/F1, macro F1, a confusion matrix, confidence diagnostics,
 challenge-tag error counts, and a machine-readable error list.
+
+The repo supports two named benchmark splits:
+
+| Dataset | File | Purpose |
+|---|---|---|
+| `core` | `data/examples.jsonl` | Balanced 64-example smoke benchmark for pipeline correctness and easy-to-review baseline behavior. |
+| `hard` | `data/examples_hard.jsonl` | More ambiguous or adversarial examples intended to expose judge boundary failures once populated. |
+
+Use separate runs for `core` and `hard` so the hard-set metrics are not washed
+out by easier examples. Once `data/examples_hard.jsonl` is populated, validate
+it with:
+
+```bash
+python scripts/validate_data.py --dataset hard
+```
+
+## Run a real judge model
+
+The provider-backed runner is deliberately outside `src/`, so the scoring
+package remains offline and dependency-free.
+
+Install the optional runner dependency:
+
+```bash
+python -m pip install -e ".[runner]"
+```
+
+Create a local credentials file and add the keys for the providers you plan to
+run:
+
+```bash
+cp .env.example .env
+```
+
+Smoke-test one core example:
+
+```bash
+python scripts/run_judge.py \
+  --provider openai \
+  --model gpt-5-nano \
+  --limit 1 \
+  --output runs/openai-gpt-5-nano-core-smoke.jsonl
+```
+
+Run all 64 core examples:
+
+```bash
+python scripts/run_judge.py \
+  --provider openai \
+  --dataset core \
+  --model gpt-5-nano \
+  --output runs/openai-gpt-5-nano-core.jsonl
+```
+
+Run the hard set independently:
+
+```bash
+python scripts/run_judge.py \
+  --provider openai \
+  --dataset hard \
+  --model gpt-5-nano \
+  --output runs/openai-gpt-5-nano-hard.jsonl
+```
+
+The runner makes one independent request per example, uses the checked-in
+judge prompt, requests strict JSON Schema output, and validates the completed
+JSONL through the same loader used by the scorer. It never sends `gold_label`,
+annotation notes, or challenge tags to the judge.
+
+Each run also writes a `.metadata.json` sidecar containing the provider, model
+ID, dataset, optional reasoning effort, UTC timestamp, prompt hash, dataset
+hash, and prediction count. Generated runs and `.env` are gitignored by
+default.
+
+Recommended comparison matrix:
+
+| Provider | Model | Reasoning effort | Datasets |
+|---|---|---|---|
+| `openai` | `gpt-5-nano` | not set | `core`, `hard` |
+| `openai` | `gpt-5.5` | not set | `core`, `hard` |
+| `together` | `openai/gpt-oss-20b` | `medium` | `core`, `hard` |
+| `together` | `openai/gpt-oss-120b` | `medium` | `core`, `hard` |
+
+Run the hosted openweight models through Together with the reasoning level
+made explicit:
+
+```bash
+python scripts/run_judge.py \
+  --provider together \
+  --dataset core \
+  --model openai/gpt-oss-20b \
+  --reasoning-effort medium \
+  --output runs/together-gpt-oss-20b-reasoning-medium-core.jsonl
+
+python scripts/run_judge.py \
+  --provider together \
+  --dataset hard \
+  --model openai/gpt-oss-20b \
+  --reasoning-effort medium \
+  --output runs/together-gpt-oss-20b-reasoning-medium-hard.jsonl
+
+python scripts/run_judge.py \
+  --provider together \
+  --dataset core \
+  --model openai/gpt-oss-120b \
+  --reasoning-effort medium \
+  --output runs/together-gpt-oss-120b-reasoning-medium-core.jsonl
+
+python scripts/run_judge.py \
+  --provider together \
+  --dataset hard \
+  --model openai/gpt-oss-120b \
+  --reasoning-effort medium \
+  --output runs/together-gpt-oss-120b-reasoning-medium-hard.jsonl
+```
+
+Score a completed run:
+
+```bash
+python scripts/score_results.py runs/openai-gpt-5-nano-core.jsonl \
+  --json-out reports/openai-gpt-5-nano-core.json
+
+python scripts/score_results.py runs/openai-gpt-5-nano-hard.jsonl \
+  --json-out reports/openai-gpt-5-nano-hard.json
+```
+
+The scorer infers `core` or `hard` from the run metadata when possible. You can
+also pass `--dataset hard` explicitly, or use `--examples path/to/file.jsonl`
+for a custom gold-label file.
+
+The model must always be passed explicitly with `--model`, keeping the
+experimental choice visible in the command history. Pass `--overwrite` to
+intentionally replace an existing run.
+
+Together GPT-OSS runs must also pass `--reasoning-effort low|medium|high`;
+the recommended comparison uses only `medium`.
 
 ## Reproducing or extending the audit
 
@@ -96,9 +236,9 @@ challenge-tag error counts, and a machine-readable error list.
 5. Read both aggregate metrics and individual errors. A single score can hide
    systematic boundary failures.
 
-No provider client is included: keeping inference outside the core package
-avoids implying that one vendor or model version defines the benchmark and
-keeps the checked-in artifact runnable offline.
+`JudgeRunner.predict(examples) -> predictions` is the provider interface.
+Additional adapters can be added under `runners/` without changing the offline
+dataset, schema, or scoring package.
 
 ## Failure analysis
 

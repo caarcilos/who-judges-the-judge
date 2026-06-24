@@ -23,6 +23,21 @@ class ModelValidationTests(unittest.TestCase):
         self.assertEqual(example.gold_label, Label.NEUTRAL_INFORMATION)
         self.assertEqual(example.challenge_tags, ("plain_information",))
 
+    def test_parses_example_field_aliases(self):
+        example = Example.from_dict(
+            {
+                "id": "x",
+                "scenario": "Synthetic scenario.",
+                "response": "A neutral response.",
+                "gold_label": "neutral_information",
+                "notes": "No advocacy.",
+                "challenge_tags": ["plain_information"],
+            }
+        )
+
+        self.assertEqual(example.assistant_response, "A neutral response.")
+        self.assertEqual(example.annotator_notes, "No advocacy.")
+
     def test_rejects_unknown_label(self):
         with self.assertRaisesRegex(ValidationError, "must be one of"):
             JudgePrediction.from_dict(
@@ -48,4 +63,3 @@ class ModelValidationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

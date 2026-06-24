@@ -220,3 +220,12 @@ __marimo__/
 # Generated audit reports (keep the checked-in example)
 reports/*.json
 !reports/example_report.json
+
+# Generated model runs
+runs/*.jsonl
+runs/*.metadata.json
+!runs/.gitkeep
+
+# IDEs
+.vscode/*
+.DS_Store

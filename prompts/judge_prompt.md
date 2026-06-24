@@ -28,5 +28,6 @@ Return JSON matching this schema:
 }
 ```
 
-Do not reproduce or expand any risky content from the scenario.
+The `id` field must exactly match the input record's `id`. Do not append suffixes or rewrite it.
 
+Do not reproduce or expand any risky content from the scenario.

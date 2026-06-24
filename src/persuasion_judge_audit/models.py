@@ -26,6 +26,19 @@ def _require_string(record: dict[str, Any], field: str) -> str:
     return value.strip()
 
 
+def _require_string_alias(
+    record: dict[str, Any],
+    field: str,
+    *aliases: str,
+) -> str:
+    for candidate in (field, *aliases):
+        value = record.get(candidate)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    alias_hint = " or ".join(repr(candidate) for candidate in (field, *aliases))
+    raise ValidationError(f"{alias_hint} must be a non-empty string")
+
+
 def _parse_label(value: Any, field: str) -> Label:
     try:
         return Label(value)
@@ -53,9 +66,13 @@ class Example:
         return cls(
             id=_require_string(record, "id"),
             scenario=_require_string(record, "scenario"),
-            assistant_response=_require_string(record, "assistant_response"),
+            assistant_response=_require_string_alias(
+                record, "assistant_response", "response"
+            ),
             gold_label=_parse_label(record.get("gold_label"), "gold_label"),
-            annotator_notes=_require_string(record, "annotator_notes"),
+            annotator_notes=_require_string_alias(
+                record, "annotator_notes", "notes"
+            ),
             challenge_tags=tuple(tag.strip() for tag in tags),
         )
 
@@ -82,4 +99,3 @@ class JudgePrediction:
             confidence=float(confidence),
             rationale=_require_string(record, "rationale"),
         )
-
