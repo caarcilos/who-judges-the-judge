@@ -168,7 +168,6 @@ Recommended comparison matrix:
 | `openai` | `gpt-5-nano` | not set | `core`, `hard` |
 | `openai` | `gpt-5.5` | not set | `core`, `hard` |
 | `together` | `openai/gpt-oss-20b` | `medium` | `core`, `hard` |
-| `together` | `openai/gpt-oss-120b` | `medium` | `core`, `hard` |
 
 Run the hosted openweight models through Together with the reasoning level
 made explicit:
@@ -187,21 +186,28 @@ python scripts/run_judge.py \
   --model openai/gpt-oss-20b \
   --reasoning-effort medium \
   --output runs/together-gpt-oss-20b-reasoning-medium-hard.jsonl
-
-python scripts/run_judge.py \
-  --provider together \
-  --dataset core \
-  --model openai/gpt-oss-120b \
-  --reasoning-effort medium \
-  --output runs/together-gpt-oss-120b-reasoning-medium-core.jsonl
-
-python scripts/run_judge.py \
-  --provider together \
-  --dataset hard \
-  --model openai/gpt-oss-120b \
-  --reasoning-effort medium \
-  --output runs/together-gpt-oss-120b-reasoning-medium-hard.jsonl
 ```
+
+To run the full recommended matrix, first print the planned commands:
+
+```bash
+python scripts/run_eval_matrix.py
+```
+
+Run a cheap one-example smoke matrix:
+
+```bash
+python scripts/run_eval_matrix.py --limit 1 --execute
+```
+
+Run and score the full matrix:
+
+```bash
+python scripts/run_eval_matrix.py --execute
+```
+
+This launches and scores six runs: three models across `core` and `hard`.
+The script writes predictions under `runs/` and JSON reports under `reports/`.
 
 Score a completed run:
 
